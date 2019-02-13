@@ -26,10 +26,6 @@ ENV LC_ALL en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
 
-RUN  /usr/bin/curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
-    && chmod +x ./kubectl  \
-    &&  mv ./kubectl /usr/local/bin/kubectl
-
 RUN set -ex \
     && buildDeps=' \
     freetds-dev \
@@ -63,7 +59,7 @@ RUN set -ex \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
     && pip install flask-bcrypt \
-    && pip install git+${AIRFLOW_GIT_URL}[crypto,celery,postgres,hive,jdbc,mysql,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
+    && pip install git+${AIRFLOW_GIT_URL}#egg=apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh,kubernetes${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}] \
     && pip install 'redis>=2.10.5,<3' \
     && if [ -n "${PYTHON_DEPS}" ]; then pip install ${PYTHON_DEPS}; fi \
     && apt-get purge --auto-remove -yqq $buildDeps \
@@ -76,6 +72,10 @@ RUN set -ex \
     /usr/share/man \
     /usr/share/doc \
     /usr/share/doc-base
+
+RUN  /usr/bin/curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
+    && chmod +x ./kubectl  \
+    &&  mv ./kubectl /usr/local/bin/kubectl
 
 COPY script/entrypoint.sh /entrypoint.sh
 COPY config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg

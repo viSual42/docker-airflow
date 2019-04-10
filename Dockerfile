@@ -59,6 +59,7 @@ RUN set -ex \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
     && pip install flask-bcrypt \
+    && pip install tenacity --upgrade \
     && pip install git+${AIRFLOW_GIT_URL}#egg=apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh,kubernetes${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}] \
     && pip install 'redis>=2.10.5,<3' \
     && if [ -n "${PYTHON_DEPS}" ]; then pip install ${PYTHON_DEPS}; fi \
